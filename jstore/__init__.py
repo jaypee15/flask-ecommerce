@@ -1,7 +1,9 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask
 
+from . import auth
+from . import market
 
 def create_app(test_config=None):
     # create and configure the app
@@ -24,9 +26,12 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    #return template
-    @app.route('/')
-    def home():
-        return render_template('home.html')
+    # register blueprints
+      
+    # app.register_blueprint(auth.bp)
+      
+    app.register_blueprint(market.bp)
+    app.add_url_rule('/', endpoint='index')
+
 
     return app
