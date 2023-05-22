@@ -1,37 +1,69 @@
-import os
+# import os
+
+# from flask import Flask
+# from flask_sqlalchemy import SQLAlchemy
+
+# from . import auth
+# from . import market
+
+# db = SQLAlchemy()
+
+# def create_app(test_config=None):
+#     # create and configure the app
+#     app = Flask(__name__, instance_relative_config=True)
+#     db.init_app(app)
+   
+#     # app.config.from_mapping(
+#     #     SECRET_KEY='dev',
+#     #     DATABASE=os.path.join(app.instance_path, 'jstore.sqlite'),
+#     # )
+#     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///market.db'
+#     import models
+
+#     with app.app_context():
+#         db.create_all()
+
+#     if test_config is None:
+#         # load the instance config, if it exists, when not testing
+#         app.config.from_pyfile('config.py', silent=True)
+#     else:
+#         # load the test config if passed in
+#         app.config.from_mapping(test_config)
+
+#     # ensure the instance folder exists
+#     try:
+#         os.makedirs(app.instance_path)
+#     except OSError:
+#         pass
+
+#     # register blueprints
+#     # app.register_blueprint(auth.bp)
+#     app.register_blueprint(market.bp)
+#     app.add_url_rule('/', endpoint='index')
+
+
+#     return app
+
+
 
 from flask import Flask
 
-from . import auth
-from . import market
+from config import Config
+from jstore.extensions import db
 
-def create_app(test_config=None):
-    # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'jstore.sqlite'),
-    )
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
+    # Initialize Flask extensions here
+    db.init_app(app)
 
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
-
-    # register blueprints
-      
-    # app.register_blueprint(auth.bp)
-      
+    # Register blueprints here
+    from . import market
     app.register_blueprint(market.bp)
     app.add_url_rule('/', endpoint='index')
-
+    @app.route('/test/')
+    def test_page():
+        return '<h1>Testing the Flask Application Factory Pattern</h1>'
 
     return app
