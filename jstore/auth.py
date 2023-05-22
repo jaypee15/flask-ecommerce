@@ -2,7 +2,7 @@ from flask import (
     Blueprint,redirect, render_template, request,url_for, flash 
 )
 bp = Blueprint('auth', __name__, url_prefix='/auth')
-from jstore.forms import RegisterForm
+from jstore.forms import RegisterForm, LoginForm
 from jstore.models import User
 from jstore.extensions import db
 
@@ -19,6 +19,12 @@ def register_page():
         #check if there are validation errors
     if form.errors != {}: 
         for err_msg in form.errors.values():
-            flash(f'Error while creating user: {err_msg}')
+            flash(f'Error while creating user: {err_msg}', category='danger')
 
     return render_template('auth/register.html', form=form)
+
+
+@bp.route('/login', methods=('GET', 'POST'))
+def login_page():
+    form = LoginForm()
+    return render_template('auth/login.html', form=form)
