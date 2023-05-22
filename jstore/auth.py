@@ -1,35 +1,24 @@
-# import functools
+from flask import (
+    Blueprint,redirect, render_template, request,url_for, flash 
+)
+bp = Blueprint('auth', __name__, url_prefix='/auth')
+from jstore.forms import RegisterForm
+from jstore.models import User
+from jstore.extensions import db
 
-# from flask import (
-#     Blueprint, flash, g, redirect, render_template, request, session, url_for
-# )
-# from werkzeug.security import check_password_hash, generate_password_hash
+@bp.route('/register', methods=('GET', 'POST'))
+def register_page():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        create_user = User(username=form.username.data,
+                              email_address=form.email_address.data,
+                              password_hash=form.password1.data)
+        db.session.add(create_user)
+        db.session.commit()
+        return redirect(url_for('market.market_page'))
+        #check if there are validation errors
+    if form.errors != {}: 
+        for err_msg in form.errors.values():
+            flash(f'Error while creating user: {err_msg}')
 
-
-
-# bp = Blueprint('auth', __name__, url_prefix='/auth')
-
-# @bp.route('/login', methods=('GET', 'POST'))
-# def login():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         db = get_db()
-#         error = None
-#         user = db.execute(
-#             'SELECT * FROM user WHERE username = ?', (username,)
-#         ).fetchone()
-
-#         if user is None:
-#             error = 'Incorrect username.'
-#         elif not check_password_hash(user['password'], password):
-#             error = 'Incorrect password.'
-
-#         if error is None:
-#             session.clear()
-#             session['user_id'] = user['id']
-#             return redirect(url_for('index'))
-
-#         flash(error)
-
-#     return render_template('auth/login.html')
+    return render_template('auth/register.html', form=form)

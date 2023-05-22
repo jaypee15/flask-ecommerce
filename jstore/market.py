@@ -18,7 +18,7 @@ def index():
 @bp.route('/market')
 def market_page():
     items = Item.query.all()
-    return render_template('market.html', items=items) 
+    return render_template('market/market.html', items=items) 
 
 
 
