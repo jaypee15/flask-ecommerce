@@ -3,8 +3,8 @@ from flask import Flask
 
 from config import Config
 from jstore.extensions import db
-from flask_login import LoginManager
-from flask_bcrypt import Bcrypt
+from jstore.extensions import login_manager
+from jstore.extensions import bcrypt
 
 
 def create_app(config_class=Config):
@@ -14,8 +14,10 @@ def create_app(config_class=Config):
 
     # Initialize Flask extensions
     db.init_app(app)
-    bcrypt = Bcrypt(app)
-    login_manager = LoginManager(app)
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
+   
+   
 
     # Register blueprints 
     from . import market
@@ -26,3 +28,4 @@ def create_app(config_class=Config):
     
 
     return app
+
