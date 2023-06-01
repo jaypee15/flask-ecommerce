@@ -1,10 +1,10 @@
 from flask import (
     Blueprint,redirect, render_template, request,url_for, flash 
 )
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 from jstore.forms import RegisterForm, LoginForm
-from jstore.models import User
+from jstore.models import User, Item
 from jstore.extensions import db
 
 @bp.route('/register', methods=('GET', 'POST'))
@@ -25,7 +25,7 @@ def register_page():
     return render_template('auth/register.html', form=form)
 
 
-@bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=['GET', 'POST'])
 def login_page():
     form = LoginForm()
     if form.validate_on_submit():
@@ -37,6 +37,12 @@ def login_page():
             flash(f'Success! You are logged in as: {attempted_user.username}', category='success')
             return redirect(url_for('market.market_page'))
         else:
-            flash('Username and password are not match! Please try again', category='danger')
+            flash('Username and password do not match! Please try again', category='danger')
 
     return render_template('auth/login.html', form=form)
+
+@bp.route('/logout')
+def logout_page():
+    logout_user()
+    flash("You have been logged out!", category='info')
+    return redirect(url_for("home_page"))
